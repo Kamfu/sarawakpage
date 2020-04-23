@@ -51,7 +51,29 @@
       ><link
         rel="stylesheet"
         href="https://kamfu.github.io/sarawakpage/stellar/assets/css/noscript.css"
-    /></noscript>
+	/></noscript>
+	<style>
+	.text-left
+	{
+		text-align: left !important;
+	}
+	.text-right
+	{
+		text-align: right !important;
+	}
+	.text-center
+	{
+		text-align: center !important;
+	}
+	.text-bold
+	{
+		font-weight: bold !important;
+	}
+	.mb-1
+	{
+		margin-bottom: 10px;
+	}
+	</style>
   </head>
   <body class="is-preload">
     <!-- Wrapper -->
@@ -59,7 +81,7 @@
       <!-- Header -->
       <header id="header" class="alt">
         <!-- <span class="logo"><img src="https://kamfu.github.io/sarawakpage/stellar/images/logo.svg" alt="" /></span> -->
-        <h1 data-template-key="site_5_companyName">Company Name</h1>
+        <h1 data-template-key="site_5_companyName" id="h1_companyName">Company Name</h1>
         <p data-template-key="site_6_companyNo">Company No</p>
         <p data-template-key="site_3_slogon">Slogon.</p>
       </header>
@@ -85,10 +107,14 @@
       <div id="main">
         <!-- First Section -->
         <section id="first" class="main special">
+			<input type="text" id="input_name" class="swkPage-input mb-1" placeholder="Your Name" maxlength="50" />
+			<input type="text" id="input_hp" class="swkPage-input mb-1" placeholder="Contact no." maxlength="12" />
+			<input type="text" id="input_email" class="swkPage-input mb-1" placeholder="Email" maxlength="50" />
+			<input type="text" id="input_address" class="swkPage-input mb-1" placeholder="Address (Optional)" maxlength="120" />
           <header class="major">
             <h2 data-template-key="list_service_title">Our Services</h2>
           </header>
-          <table class="alt">
+          <table class="alt" id="list_3_products_table">
             <thead>
               <tr>
                 <th>Description</th>
@@ -96,47 +122,17 @@
                 <th>Quantity</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>
-                  Fish Burger (SKU:Fish-B).<br />
-                  Sweet and sour, good for couples.
-                </td>
-                <td>9.99</td>
-                <td>
-                  <select>
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  Vis ac commodo adipiscing arcu aliquet.
-                </td>
-                <td>19.99</td>
-                <td>
-                  <select>
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                  </select>
-                </td>
-              </tr>
-            </tbody>
+            <tbody></tbody>
             <tfoot>
               <tr>
-                <td colspan="2"></td>
-                <td>100.00</td>
+                <td colspan="2" class="text-bold text-right">Estimated (RM)</td>
+                <td class="text-bold" id="total_estimated">0.00</td>
               </tr>
             </tfoot>
           </table>
           <footer class="major">
             <ul class="actions special">
-              <li><a href="#cta" class="button">Order Now</a></li>
+              <li><button type="button" class="button" id="btnOrder">Enquire Now</button></li>
             </ul>
           </footer>
         </section>
@@ -177,7 +173,7 @@
         <!-- Second Section -->
         <section id="second" class="main special">
           <header class="major">
-            <h2>Busienss Hours</h2>
+            <h2>Business Hours</h2>
           </header>
           <!-- Busienss Hours Listings here -->
 
@@ -308,20 +304,122 @@
     <script src="https://kamfu.github.io/sarawakpage/stellar/assets/js/util.js"></script>
     <script src="https://kamfu.github.io/sarawakpage/stellar/assets/js/main.js"></script>
 
-    <textarea
-      id="contact_7_whatsapp"
-      data-template-val="contact_7_whatsapp"
-    ></textarea>
-    <textarea
-      id="list_3_products"
-      data-template-val="list_3_products"
-    ></textarea>
+<textarea id="contact_7_whatsapp" style="display:none;" data-template-val="contact_7_whatsapp">601111002009</textarea>
+<textarea id="list_3_products" style="display:none;" data-template-val="list_3_products">
+[{"desc":"3","id":"3","name":"3","price":"3","unit":"3"},{"desc":"2","id":"2","name":"2","price":"2.22","unit":"2"},{"desc":"1","id":"1","name":"1","price":"1","unit":"1"}]
+</textarea>
     <script>
       // self executing function here
       $(document).ready(function () {
-        var list_3_products = $("#list_3_products").val();
-        console.log(list_3_products);
-      });
+		initLocalStorage();
+		var contact_7_whatsapp = $("#contact_7_whatsapp").val();
+		var list_3_products = $("#list_3_products").val();
+		var list_3_products_obj = JSON.parse(list_3_products);
+		console.log(list_3_products);
+		var trHtml = '';
+		for(item in list_3_products_obj)
+		{
+			var productPrice = Math.round(list_3_products_obj[item].price).toFixed(2);
+			var tdHtml  = '<tr class="tr_row">';
+			var descString  = list_3_products_obj[item].name + ' (' + list_3_products_obj[item].id + ') <br/>' + list_3_products_obj[item].desc;
+			var descShotString  = '[' + list_3_products_obj[item].id + '] ' + list_3_products_obj[item].name + ' ';
+			console.log(descShotString);
+					tdHtml += '<td class="desc">'+ descString +'</td>';
+					tdHtml += '<td>'+ productPrice +'</td>';
+			var unitSelect  = '<select class="select-product-quantity" data-price="'+productPrice+'" data-shotdesc="'+ descShotString +'">';
+				for(var i = 0;i<=(list_3_products_obj[item].unit);i++)
+				{
+					unitSelect += '<option class="text-center" value="' + i + '">' + i + '</option>';
+				}
+				unitSelect += '</select>';
+					tdHtml += '<td>'+ unitSelect +'</td>';
+				tdHtml += '</tr>';
+			$('#list_3_products_table tbody').append(tdHtml);
+		}
+		setLocalStorage();
+		initSelectOption();
+		function initLocalStorage() {
+			const input_name    = localStorage.getItem('swkPage_name');
+			const input_hp      = localStorage.getItem('swkPage_hp');
+			const input_email   = localStorage.getItem('swkPage_email');
+			const input_address = localStorage.getItem('swkPage_address');
+			$("#input_name").val(input_name);
+			$("#input_hp").val(input_hp);
+			$("#input_email").val(input_email);
+			$("#input_address").val(input_address);
+		}
+		function setLocalStorage() {
+			$('.swkPage-input').off();
+			$('.swkPage-input').on('keyup', function(){
+				const input_name = $("#input_name").val();
+				const input_hp = $("#input_hp").val();
+				const input_email = $("#input_email").val();
+				const input_address = $("#input_address").val();
+				if(input_name.length > 0)
+				{
+					localStorage.setItem('swkPage_name', input_name);
+				}
+				if(input_hp.length > 0)
+				{
+					localStorage.setItem('swkPage_hp', input_hp);
+				}
+				if(input_email.length > 0)
+				{
+					localStorage.setItem('swkPage_email', input_email);
+				}
+				if(input_address.length > 0)
+				{
+					localStorage.setItem('swkPage_address', input_address);
+				}
+			});
+		}
+		function initSelectOption() {
+		  var finaText = '';
+		  $('.select-product-quantity').off();
+		  $('.select-product-quantity').on('change', function() {	
+			const input_companyname = $("#h1_companyName").text();
+			const input_name = $("#input_name").val();
+			const input_hp = $("#input_hp").val();
+			const input_email = $("#input_email").val();
+			const input_address = $("#input_address").val();
+
+			let estimatedTotal = parseFloat(0.00);
+			let sendMessageTxt  = 'Hi! '+input_companyname+', \r\n';
+				sendMessageTxt += 'Name: '+input_name+' \r\n';
+				sendMessageTxt += 'HP Tel: '+input_hp+' \r\n';
+				sendMessageTxt += 'Email: '+input_email+' \r\n';
+				sendMessageTxt += 'Address: '+input_address+' \r\n \r\n';
+				sendMessageTxt += 'I am interested to buy/reserve: \r\n \r\n';
+			$('.select-product-quantity').each(function(index,element) {
+				const shotdesc = $(this).data('shotdesc');
+				console.log(shotdesc);
+				let productTotal   = parseFloat(0.00);
+				let productQuantiy = parseFloat($(element).val());
+				let productPrice   = parseFloat($(element).data('price'));
+					productTotal    = productQuantiy*productPrice;
+				if( parseInt(productTotal) > 0)
+				{
+					estimatedTotal  = estimatedTotal + productTotal;
+					sendMessageTxt += shotdesc +': *'+ productQuantiy +'* units of _'+ productPrice +'_ = '+ Math.floor(productTotal).toFixed(2) +' \r\n';
+				}
+			});
+			estimatedTotal  = Math.floor(estimatedTotal).toFixed(2);
+			sendMessageTxt += '\r\n Estimated (RM) *' + estimatedTotal + '* \r\n ';
+			sendMessageTxt += 'Could you help me to confirm? \r\n';
+			$('#total_estimated').text( estimatedTotal );
+			console.log(sendMessageTxt);
+			finaText = sendMessageTxt;
+		  });
+
+		  $('#btnOrder').off();
+		  $('#btnOrder').on('click', function() {
+			finaText = window.encodeURIComponent(finaText);
+			let url = 'https://api.whatsapp.com/send?phone='+contact_7_whatsapp+'&text='+finaText;
+			window.open(url, "_blank");
+		  });
+	  }
+	  });
+
     </script>
   </body>
 </html>
